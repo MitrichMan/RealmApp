@@ -18,14 +18,8 @@ final class TaskListViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let addButton = UIBarButtonItem(
-            barButtonSystemItem: .add,
-            target: self,
-            action: #selector(addButtonPressed)
-        )
-        
-        navigationItem.rightBarButtonItem = addButton
-        navigationItem.leftBarButtonItem = editButtonItem
+        setupUI()
+       
         taskLists = storageManager.realm.objects(TaskList.self)
         createTempData()
     }
@@ -52,7 +46,6 @@ final class TaskListViewController: UITableViewController {
             checkMarkImage.image = UIImage(systemName: "checkmark")
             checkMarkImage.frame = CGRect(x: 0, y: 0, width: 14, height: 14)
             cell.accessoryView = checkMarkImage
-            content.secondaryText = ""
         } else {
             cell.accessoryView = nil
             content.secondaryText = taskList.tasks.filter("isComplete = false").count.formatted()
@@ -123,6 +116,18 @@ final class TaskListViewController: UITableViewController {
                 tableView.reloadData()
             }
         }
+    }
+    
+    // MARK: - Setup UI
+    private func setupUI() {
+        let addButton = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(addButtonPressed)
+        )
+        
+        navigationItem.rightBarButtonItem = addButton
+        navigationItem.leftBarButtonItem = editButtonItem
     }
 }
 

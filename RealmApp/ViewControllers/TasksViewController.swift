@@ -19,19 +19,13 @@ class TasksViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = taskList.title
+        setupUI()
         
-        let addButton = UIBarButtonItem(
-            barButtonSystemItem: .add,
-            target: self,
-            action: #selector(addButtonPressed)
-        )
-        navigationItem.rightBarButtonItems = [addButton, editButtonItem]
         currentTasks = taskList.tasks.filter("isComplete = false")
         completedTasks = taskList.tasks.filter("isComplete = true")
     }
     
-    // MARK: - UITableViewDelegate
+    // MARK: - Table view delegate
         override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             tableView.deselectRow(at: indexPath, animated: true)
         }
@@ -52,10 +46,15 @@ class TasksViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TasksCell", for: indexPath)
         var content = cell.defaultContentConfiguration()
-        let task = indexPath.section == 0 ? currentTasks[indexPath.row] : completedTasks[indexPath.row]
+        let task = indexPath.section == 0
+        ? currentTasks[indexPath.row]
+        : completedTasks[indexPath.row]
+        
         content.text = task.title
         content.secondaryText = task.note
+        
         cell.contentConfiguration = content
+        
         return cell
     }
     
@@ -64,13 +63,9 @@ class TasksViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        var task: Task!
-        
-        if indexPath.section == 0 {
-            task = currentTasks[indexPath.row]
-        } else {
-            task = completedTasks[indexPath.row]
-        }
+        let task = indexPath.section == 0
+        ? currentTasks[indexPath.row]
+        : completedTasks[indexPath.row]
                 
         let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { [unowned self] _, _, _ in
             storageManager.deleteTask(task)
@@ -91,7 +86,7 @@ class TasksViewController: UITableViewController {
             isDone(true)
         }
         
-        if indexPath.section == 0 {
+        if !task.isComplete {
             doneAction.title = "Done"
             doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
         } else {
@@ -103,7 +98,18 @@ class TasksViewController: UITableViewController {
         
         return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
     }
-
+    
+    // MARK: - Setup UI
+    private func setupUI() {
+        title = taskList.title
+        
+        let addButton = UIBarButtonItem(
+            barButtonSystemItem: .add,
+            target: self,
+            action: #selector(addButtonPressed)
+        )
+        navigationItem.rightBarButtonItems = [addButton, editButtonItem]
+    }
 }
 
 // MARK: - Alert Controller
